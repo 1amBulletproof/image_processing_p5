@@ -48,6 +48,8 @@ Shape feature extraction typically falls into one of two types:
 
     - Region based feature extraction extract features for the entireity of a shape, not just its boundary or contour like above. Simple regional descriptors include the area of the region (the number of pixels) the permiter of a region , the compactness of a region (calculated by comparing the permiter and area), the mean/median/min/max gray-level values for a given region and even number of pixels above/abelow a gray-value threshold in a given region. Specific algorithms such as the circularity ratio may be used as well (circularity is essentially the ratio of the area of a shape to the area of a circle having hte same perimeter, this same calculation can be made with rectangles to find the rectangularity shape feature).
 
+    - Also there is corner detection?
+
 It is generally believed that human visual systems use texture for recognition and interpretation so it makes sense that computers do as well. Texture variance include direcitonal vs. non-directional, smooth vs. rough, coarse vs. fine, and regulard vs. irregular. 
         - Spatial texture features are found through statistics or local pixel strcutures in the original image domain. Spatial features are meaningful and easy to understand and can be extracted from any shape without losing information but they are sensitive to noise and distortions (a common problem with any feature extraction: see several above color methods). 
 

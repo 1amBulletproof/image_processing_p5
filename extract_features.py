@@ -36,7 +36,7 @@ def extract_features(src_image):
 
     #shape descriptors
 
-    # SIFT: returns 2d descriptor array, so take avg of each, or just write them out linearly.. 
+    # SIFT: returns 2d descriptor array, so take avg of each, or just write them out linearly...or take average of the first value etc.. 
     sift = cv2.xfeatures2d.SIFT_create(1)
     (keypoints, descriptors) = sift.detectAndCompute(src_image, None)
     #Just write them all to string...
