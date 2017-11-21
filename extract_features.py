@@ -45,19 +45,27 @@ def extract_features(src_image_bgr, src_image_gray):
     #print("feature_vector is " + str(len(feature_vector)) + " long")
     return feature_vector
 
+
 def append_sift_descriptors(src_image_gray, feature_vector):
     #TODO: create a normalized histogram of the SIFT stuff then call append_histogram_descriptors?
-    # SIFT: returns 2d descriptor array, so take avg of each, or just write them out linearly...or take average of the first value etc.. 
+    # SIFT: returns 2d descriptor array: capture as stats or histogram or use all values
     sift = cv2.xfeatures2d.SIFT_create(1)
     (keypoints, descriptors) = sift.detectAndCompute(src_image_gray, None)
     #Just write them all to string...
-    feature_vector.extend(descriptors[0])
-    '''
-    # use the first 25 descriptors...
-    for descriptor_vector in descriptors:
-        descriptor_vector_average = numpy.mean(descriptor_vector)
-        feature_vector.append(descriptor_vector_average)
-    ''' 
+    #feature_vector.extend(descriptors[0])
+    sift_std = numpy.std(descriptors)
+    sift_mean = numpy.mean(descriptors)
+    sift_median = numpy.median(descriptors)
+    sift_max = numpy.amax(descriptors)
+    sift_variance = numpy.var(descriptors)
+    feature_vector.append(sift_std)
+    feature_vector.append(sift_mean)
+    feature_vector.append(sift_median)
+    feature_vector.append(sift_max)
+    feature_vector.append(sift_variance)
+    return
+
+
 def append_gray_histogram_descriptors(src_image_gray, feature_vector):
     #get histogram
     gray_histogram = cv2.calcHist([src_image_gray], [0], None, [256],[0,256])
@@ -66,6 +74,7 @@ def append_gray_histogram_descriptors(src_image_gray, feature_vector):
 
     append_histogram_descriptors(gray_histogram, feature_vector)
     return
+
 
 def append_color_histogram_descriptors(src_image_bgr, feature_vector):
     # get B, G, R histograms
@@ -76,6 +85,7 @@ def append_color_histogram_descriptors(src_image_bgr, feature_vector):
         histogram = histogram.flatten()
         append_histogram_descriptors(histogram, feature_vector)
     return
+
 
 def append_histogram_descriptors(histogram, feature_vector):
     #extract descriptors: mean, std_dev, max val & index of max val (color value)
