@@ -23,7 +23,7 @@ def extract_features(src_image_bgr, src_image_gray):
     append_gray_histogram_descriptors(src_image_gray, feature_vector)
 
     # color histogram descriptors
-    #append_color_histogram_descriptors(src_image_bgr, feature_vector)
+    append_color_histogram_descriptors(src_image_bgr, feature_vector)
 
     #Edge Detection/Contour
 
