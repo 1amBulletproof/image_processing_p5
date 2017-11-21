@@ -61,7 +61,7 @@ def append_sift_descriptors(src_image_gray, feature_vector):
 def append_gray_histogram_descriptors(src_image_gray, feature_vector):
     #get histogram
     gray_histogram = cv2.calcHist([src_image_gray], [0], None, [256],[0,256])
-    cv2.normalize(gray_histogram, gray_histogram)
+    #cv2.normalize(gray_histogram, gray_histogram)
     gray_histogram = gray_histogram.flatten()
 
     append_histogram_descriptors(gray_histogram, feature_vector)
@@ -69,9 +69,12 @@ def append_gray_histogram_descriptors(src_image_gray, feature_vector):
 
 def append_color_histogram_descriptors(src_image_bgr, feature_vector):
     # get B, G, R histograms
-    bgr_histogram = cv2.calcHist([src_image_bgr], [0,1,2], None, [8,8,8],[0,256, 0, 256, 0, 256])
-    cv2.normalize(bgr_histogram, bgr_histogram)
-    bgr_histogram = bgr_histogram.flatten()
+    channels = cv2.split(src_image_bgr)
+    for channel in channels:
+        histogram = cv2.calcHist([channel], [0], None, [256], [0,256])
+        #cv2.normalize(histogram, histogram)
+        histogram = histogram.flatten()
+        append_histogram_descriptors(histogram, feature_vector)
     return
 
 def append_histogram_descriptors(histogram, feature_vector):
