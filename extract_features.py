@@ -41,28 +41,25 @@ def extract_features(src_image_bgr, src_image_gray):
     append_sift_descriptors(src_image_gray, feature_vector)
 
     # do SURF stuff
+    append_surf_descriptors(src_image_gray, feature_vector)
 
     #print("feature_vector is " + str(len(feature_vector)) + " long")
     return feature_vector
 
 
+def append_surf_descriptors(src_image_gray, feature_vector):
+    # SURF: returns 2d descriptor array: capture as stats or histogram or use all values
+    surf = cv2.xfeatures2d.SURF_create(1)
+    (keypoints, descriptors) = surf.detectAndCompute(src_image_gray, None)
+    append_array_statistic_descriptors(descriptors, feature_vector)
+    return
+
+
 def append_sift_descriptors(src_image_gray, feature_vector):
-    #TODO: create a normalized histogram of the SIFT stuff then call append_histogram_descriptors?
     # SIFT: returns 2d descriptor array: capture as stats or histogram or use all values
     sift = cv2.xfeatures2d.SIFT_create(1)
     (keypoints, descriptors) = sift.detectAndCompute(src_image_gray, None)
-    #Just write them all to string...
-    #feature_vector.extend(descriptors[0])
-    sift_std = numpy.std(descriptors)
-    sift_mean = numpy.mean(descriptors)
-    sift_median = numpy.median(descriptors)
-    sift_max = numpy.amax(descriptors)
-    sift_variance = numpy.var(descriptors)
-    feature_vector.append(sift_std)
-    feature_vector.append(sift_mean)
-    feature_vector.append(sift_median)
-    feature_vector.append(sift_max)
-    feature_vector.append(sift_variance)
+    append_array_statistic_descriptors(descriptors, feature_vector)
     return
 
 
@@ -98,6 +95,20 @@ def append_histogram_descriptors(histogram, feature_vector):
     feature_vector.append(max_val)
     feature_vector.append(max_index)
     return
+
+def append_array_statistic_descriptors( array, feature_vector):
+    std = numpy.std(array)
+    mean = numpy.mean(array)
+    median = numpy.median(array)
+    maximum = numpy.amax(array)
+    variance = numpy.var(array)
+    feature_vector.append(std)
+    feature_vector.append(mean)
+    feature_vector.append(median)
+    feature_vector.append(maximum)
+    feature_vector.append(variance)
+    return
+
 
 
 ##Load Image
