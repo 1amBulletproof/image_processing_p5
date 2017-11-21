@@ -11,18 +11,19 @@ import random
 import numpy
 
 #Extracts features from image and returns them as a vector
-def extract_features(src_image):
+def extract_features(src_image_bgr, src_image_gray):
     feature_vector = []
+    src_image_hsv = cv2.cvtColor(src_image_bgr, cv2.COLOR_BGR2HSV)
 
     #Image size/shape
-    feature_vector.append(src_image.shape[0])#height
-    feature_vector.append(src_image.shape[1])#width
+    feature_vector.append(src_image_bgr.shape[0])#height
+    feature_vector.append(src_image_bgr.shape[1])#width
 
     # gray-scale histogram descriptors
-    #append_histogram_descriptors(src_image, feature_vector)
+    append_gray_histogram_descriptors(src_image_gray, feature_vector)
 
     # color histogram descriptors
-    #append_histogram_descriptors(src_image, feature_vector)
+    #append_color_histogram_descriptors(src_image_bgr, feature_vector)
 
     #Edge Detection/Contour
 
@@ -36,9 +37,19 @@ def extract_features(src_image):
 
     #shape descriptors
 
+    #SIFT descriptors
+    append_sift_descriptors(src_image_gray, feature_vector)
+
+    # do SURF stuff
+
+    #print("feature_vector is " + str(len(feature_vector)) + " long")
+    return feature_vector
+
+def append_sift_descriptors(src_image_gray, feature_vector):
+    #TODO: create a normalized histogram of the SIFT stuff then call append_histogram_descriptors?
     # SIFT: returns 2d descriptor array, so take avg of each, or just write them out linearly...or take average of the first value etc.. 
     sift = cv2.xfeatures2d.SIFT_create(1)
-    (keypoints, descriptors) = sift.detectAndCompute(src_image, None)
+    (keypoints, descriptors) = sift.detectAndCompute(src_image_gray, None)
     #Just write them all to string...
     feature_vector.extend(descriptors[0])
     '''
@@ -47,15 +58,32 @@ def extract_features(src_image):
         descriptor_vector_average = numpy.mean(descriptor_vector)
         feature_vector.append(descriptor_vector_average)
     ''' 
+def append_gray_histogram_descriptors(src_image_gray, feature_vector):
+    #get histogram
+    gray_histogram = cv2.calcHist([src_image_gray], [0], None, [256],[0,256])
+    cv2.normalize(gray_histogram, gray_histogram)
+    gray_histogram = gray_histogram.flatten()
 
-    # do SURF stuff
+    append_histogram_descriptors(gray_histogram, feature_vector)
+    return
 
-    #print("feature_vector is " + str(len(feature_vector)) + " long")
-    return feature_vector
+def append_color_histogram_descriptors(src_image_bgr, feature_vector):
+    # get B, G, R histograms
+    bgr_histogram = cv2.calcHist([src_image_bgr], [0,1,2], None, [8,8,8],[0,256, 0, 256, 0, 256])
+    cv2.normalize(bgr_histogram, bgr_histogram)
+    bgr_histogram = bgr_histogram.flatten()
+    return
 
+def append_histogram_descriptors(histogram, feature_vector):
+    #extract descriptors: mean, std_dev, max val & index of max val (color value)
+    mean, std_dev = cv2.meanStdDev(histogram)
+    max_val = numpy.amax(histogram)
+    max_index = numpy.argmax(histogram)
 
-def append_histogram_descriptors(src_image, feature_vector):
-    #hsv_image = cv2. 
+    feature_vector.append(mean[0][0])
+    feature_vector.append(std_dev[0][0])
+    feature_vector.append(max_val)
+    feature_vector.append(max_index)
     return
 
 
@@ -66,14 +94,14 @@ if __name__=='__main__':
     # Load the source image.
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        #orig_src_image = cv2.imread(filename, 1) # load as color
-        orig_src_image = cv2.imread(filename, 0) # load as gray
+        orig_src_image_bgr = cv2.imread(filename, 1) # load as color
+        orig_src_image_gray = cv2.imread(filename, 0) # load as gray
     else:
         print "ERROR: %s image.png" % (sys.argv[0])
         sys.exit(1)
 
     #Extract image features
-    feature_vector = extract_features(orig_src_image)
+    feature_vector = extract_features(orig_src_image_bgr, orig_src_image_gray)
 
     #Print features
     print "%s,%s" % (filename, ','.join(str(x) for x in feature_vector))
