@@ -36,6 +36,8 @@ def extract_features(src_image_bgr, src_image_gray):
     #Necronomicon descriptors
 
     #shape descriptors
+    #ORB descriptors
+    append_orb_descriptors(src_image_gray, feature_vector)
 
     #SIFT descriptors
     append_sift_descriptors(src_image_gray, feature_vector)
@@ -46,9 +48,15 @@ def extract_features(src_image_bgr, src_image_gray):
     #print("feature_vector is " + str(len(feature_vector)) + " long")
     return feature_vector
 
+def append_orb_descriptors(src_image_gray, feature_vector):
+    # ORB: returns 2d descriptor array
+    orb = cv2.ORB_create()
+    (keypoints, descriptors) = orb.detectAndCompute(src_image_gray, None)
+    append_array_statistic_descriptors(descriptors, feature_vector)
+    return
 
 def append_surf_descriptors(src_image_gray, feature_vector):
-    # SURF: returns 2d descriptor array: capture as stats or histogram or use all values
+    # SURF: returns 2d descriptor array
     surf = cv2.xfeatures2d.SURF_create(1)
     (keypoints, descriptors) = surf.detectAndCompute(src_image_gray, None)
     append_array_statistic_descriptors(descriptors, feature_vector)
@@ -56,7 +64,7 @@ def append_surf_descriptors(src_image_gray, feature_vector):
 
 
 def append_sift_descriptors(src_image_gray, feature_vector):
-    # SIFT: returns 2d descriptor array: capture as stats or histogram or use all values
+    # SIFT: returns 2d descriptor array
     sift = cv2.xfeatures2d.SIFT_create(1)
     (keypoints, descriptors) = sift.detectAndCompute(src_image_gray, None)
     append_array_statistic_descriptors(descriptors, feature_vector)
