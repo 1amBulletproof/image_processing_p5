@@ -32,10 +32,10 @@ def extract_features(src_image_bgr, src_image_gray):
     #Thumbnail image
 
     #corner descriptors
+    append_corner_descriptors(src_image_gray, feature_vector)
 
     #Necronomicon descriptors
 
-    #shape descriptors
     #ORB descriptors
     append_orb_descriptors(src_image_gray, feature_vector)
 
@@ -48,12 +48,29 @@ def extract_features(src_image_bgr, src_image_gray):
     #print("feature_vector is " + str(len(feature_vector)) + " long")
     return feature_vector
 
+
+def append_corner_descriptors(src_image_gray, feature_vector):
+    # goodFeaturesToTrack: returns array of corners
+    max_corners = 100
+    qualityLevel = 0.01
+    min_distance_between_corners = 10
+    corners = cv2.goodFeaturesToTrack(
+            src_image_gray, 
+            max_corners, 
+            qualityLevel,
+            min_distance_between_corners)
+    number_of_corners = len(corners)
+    feature_vector.append(number_of_corners)
+    return
+
+
 def append_orb_descriptors(src_image_gray, feature_vector):
     # ORB: returns 2d descriptor array
     orb = cv2.ORB_create()
     (keypoints, descriptors) = orb.detectAndCompute(src_image_gray, None)
     append_array_statistic_descriptors(descriptors, feature_vector)
     return
+
 
 def append_surf_descriptors(src_image_gray, feature_vector):
     # SURF: returns 2d descriptor array
@@ -103,6 +120,7 @@ def append_histogram_descriptors(histogram, feature_vector):
     feature_vector.append(max_val)
     feature_vector.append(max_index)
     return
+
 
 def append_array_statistic_descriptors( array, feature_vector):
     std = numpy.std(array)
