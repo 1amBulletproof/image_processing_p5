@@ -25,16 +25,8 @@ def extract_features(src_image_bgr, src_image_gray):
     # color histogram descriptors
     append_color_histogram_descriptors(src_image_bgr, feature_vector)
 
-    #Edge Detection/Contour
-
-    #Fourier descriptors
-
-    #Thumbnail image
-
     #corner descriptors
     append_corner_descriptors(src_image_gray, feature_vector)
-
-    #Necronomicon descriptors
 
     #ORB descriptors
     append_orb_descriptors(src_image_gray, feature_vector)
